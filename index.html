@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="ble02.js">
+
+    </script>
+    <title>Web Bluetooth</title>
+  </head>
+  <body>
+    <p>Battery Service</p>
+    <button onClick='onScanButtonClick()'>Scan</button>
+    <button onClick='onDisconnectButtonClick()'>Disconnect</button>
+    <button onClick='onReconnectButtonClick()'>Reconnect</button>
+    <button onClick='onReadButtonClick()'>Read a Battery Level</button>
+    <button onclick='onStartButtonClick()'>Start notifications</button>
+    <button onclick='onStopButtonClick()'>Stop notifications</button>
+    <p>Heart Rate Service</p>
+    <input type="text"></input>
+    <button onclick="writeHeartRate()">writeHeartRate</button>
+    <button onclick="heartRateNotify()">heartRateNotify</button>
+    <p> Read and write to Bluetooth descriptors </p>
+    <button onclick="readDescription()">Read Health Thermometer Description</button><br><br>  
+    <label for="descript">input description:</label>
+    <input type="text" id="descript" name="descript">
+    <button onclick="writeDescription()">Write Health Thermometer Description</button>  
+
+  </body>
+</html>

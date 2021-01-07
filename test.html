@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <script>
+    //   const onButtonClick = () => {
+    //     let filters = [];
+
+    //     //// >>>>>> filter by services
+    //     filters.push({ services: ["battery_service"] });
+    //     // filters.push({services: [0x0029, 0x002a, '00001234-0000-1000-8000-00805f9b34fb']})
+    //     navigator.bluetooth
+    //       .requestDevice({ filters: filters })
+
+    //       //// >>>>>> filter by name
+    //       // filters.push({name: 'vivo 1610'})
+    //       // navigator.bluetooth.requestDevice({
+    //       //     filters: filters,
+    //       //     optionalServices: ['battery_service']})
+
+    //       //// >>>>>>>> acceptAllDevices
+    //       // navigator.bluetooth.requestDevice({
+    //       //     acceptAllDevices: true,
+    //       //     // optionalServices: ['battery_service']
+    //       // })
+
+    //       // Connect to a Bluetooth device
+    //       .then((device) => {
+    //         console.log("device ====>", device);
+    //         return device.gatt.connect();
+    //       })
+    //       // Read a Bluetooth Characteristic
+    //       // get a Primary GATT Service
+    //       .then((server) => {
+    //         console.log("Getting Battery Service...");
+    //         return server.getPrimaryService("battery_service");
+    //       })
+    //       // get battery_level Characteristic.
+    //       .then((service) => {
+    //         console.log("Getting Battery Level Characteristic...");
+    //         return service.getCharacteristic("battery_level");
+    //       })
+    //       .then((characteristic) => {
+    //         console.log("Reading Battery Level...");
+    //         return characteristic.readValue();
+    //       })
+
+    //       // .then(characteristic => {
+    //       //     // Set up event listener for when characteristic value changes.
+    //       //     characteristic.addEventListener('characteristicvaluechanged', handleBatteryLevelChanged);
+    //       //     // Reading Battery Level…
+    //       //     return characteristic.readValue();
+    //       // })
+
+    //       .then((value) => {
+    //         let batteryLevel = value.getUint8(0);
+    //         console.log("> Battery Level is " + batteryLevel + "%");
+    //       })
+    //       .catch((error) => {
+    //         console.log("Argh! " + error);
+    //       });
+    //   };
+
+      const onButtonClick = () => {
+        let filters = [];
+
+        //// >>>>>> filter by services
+        filters.push({ services: ["battery_service"] });
+        // filters.push({services: [0x0029, 0x002a, '00001234-0000-1000-8000-00805f9b34fb']})
+        navigator.bluetooth
+          .requestDevice({ filters: filters })
+
+          // Connect to a Bluetooth device
+          .then((device) => {
+            device.addEventListener('gattserverdisconnected', onDisconnected);
+            console.log("device ====>", device);
+            return device.gatt.connect();
+          })
+          // Read a Bluetooth Characteristic
+          // get a Primary GATT Service
+          .then((server) => {
+            console.log("Getting Battery Service...");
+            return server.getPrimaryService("battery_service");
+          })
+          // get battery_level Characteristic.
+          .then((service) => {
+            console.log("Getting Battery Level Characteristic...");
+            return service.getCharacteristic("battery_level");
+          })
+          .then((characteristic) => {
+            console.log("Reading Battery Level...");
+            return characteristic.readValue();
+          })
+          .then((value) => {
+            let batteryLevel = value.getUint8(0);
+            console.log("> Battery Level is " + batteryLevel + "%");
+          })
+          .catch((error) => {
+            console.log("Argh! " + error);
+          });
+      };
+
+      // function handleBatteryLevelChanged(event) {
+      //     const batteryLevel = event.target.value.getUint8(0);
+      //     console.log('Battery percentage is -----> ' + batteryLevel);
+      // }
+
+      var myCharacteristic;
+
+      const onStartButtonClick = async () => {
+        let serviceUuid = "battery_service";
+        let characteristicUuid = "battery_level";
+
+        try {
+          console.log("Requesting Bluetooth Device...");
+          const device = await navigator.bluetooth.requestDevice({
+            filters: [{ services: [serviceUuid] }],
+          });
+
+          await device.addEventListener('gattserverdisconnected', onDisconnected);
+
+          console.log("Connecting to GATT Server...");
+          const server = await device.gatt.connect();
+
+          console.log("Getting Service...");
+          const service = await server.getPrimaryService(serviceUuid);
+
+          console.log("Getting Characteristic...");
+          myCharacteristic = await service.getCharacteristic(
+            characteristicUuid
+          );
+
+          await myCharacteristic.startNotifications();
+
+          console.log("> Notifications started");
+          myCharacteristic.addEventListener(
+            "characteristicvaluechanged",
+            handleNotifications
+          );
+        } catch (error) {
+          console.log("Argh! " + error);
+        }
+      };
+
+      const onStopButtonClick = async () => {
+        if (myCharacteristic) {
+          try {
+            await myCharacteristic.stopNotifications();
+            console.log("> Notifications stopped");
+            myCharacteristic.removeEventListener(
+              "characteristicvaluechanged",
+              handleNotifications
+            );
+          } catch (error) {
+            console.log("Argh! " + error);
+          }
+        }
+      };
+
+      function handleNotifications(event) {
+        let value = event.target.value;
+        let a = [];
+        // Convert raw data bytes to hex values just for the sake of showing something.
+        // In the "real" world, you'd use data.getUint8, data.getUint16 or even
+        // TextDecoder to process raw data bytes.
+        for (let i = 0; i < value.byteLength; i++) {
+          a.push("0x" + ("00" + value.getUint8(i).toString(16)).slice(-2));
+        }
+        console.log("> " + a.join(" "));
+      }
+
+
+      const writeHeartRate = () => {
+        console.log("Requesting Bluetooth Device...");
+        navigator.bluetooth
+          .requestDevice({ filters: [{ services: ["heart_rate"] }] })
+          .then((device) => {
+            device.addEventListener('gattserverdisconnected', onDisconnected);
+            return device.gatt.connect()
+          })
+          .then((server) => server.getPrimaryService("heart_rate"))
+          .then((service) =>
+            service.getCharacteristic("heart_rate_control_point")
+          )
+          .then((characteristic) => {
+            // Writing 1 is the signal to reset energy expended.
+            const resetEnergyExpended = Uint8Array.of(200);
+            return characteristic.writeValue(resetEnergyExpended);
+          })
+          .then((_) => {
+            console.log("Energy expended has been reset.");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      };
+
+      const heartRateNotify = () => {
+        navigator.bluetooth
+          .requestDevice({ filters: [{ services: ["heart_rate"] }] })
+          .then((device) =>{
+            device.addEventListener('gattserverdisconnected', onDisconnected);
+            return device.gatt.connect()
+          })
+          .then((server) => server.getPrimaryService("heart_rate"))
+          .then((service) =>
+            service.getCharacteristic("heart_rate_measurement")
+          )
+          .then((characteristic) => characteristic.startNotifications())
+          .then((characteristic) => {
+            characteristic.addEventListener(
+              "characteristicvaluechanged",
+              handleCharacteristicValueChanged
+            );
+            console.log("Notifications have been started.");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+        function handleCharacteristicValueChanged(event) {
+          const value = event.target.value;
+          console.log("Received " + value.getUint8(0));
+          // TODO: Parse Heart Rate Measurement value.
+          // See https://github.com/WebBluetoothCG/demos/blob/gh-pages/heart-rate-sensor/heartRateSensor.js
+        }
+      }
+    
+      const onDisconnected = (event) => {
+        const device = event.target;
+        console.log(`> Device ${device.name} is disconnected.`);
+      }
+
+    //   const healthThermometer = () => {
+    //     navigator.bluetooth.requestDevice({ filters: [{ services: ['health_thermometer'] }] })
+    //     .then(device => device.gatt.connect())
+    //     .then(server => server.getPrimaryService('health_thermometer'))
+    //     .then(service => service.getCharacteristic('measurement_interval'))
+    //     .then(characteristic => characteristic.getDescriptor('gatt.characteristic_user_description'))
+    //     .then(descriptor => {
+    //     const encoder = new TextEncoder('utf-8');
+    //     const userDescription = encoder.encode('Defines the time between measurements.');
+    //     return descriptor.writeValue(userDescription);
+    //     })
+    //     .catch(error => { console.error(error); });
+    //   }
+
+    const readService = async() => {
+      console.log('Requesting Bluetooth Device...');
+      const device = await navigator.bluetooth.requestDevice({
+          filters: [{services: ['battery_service']}]});
+
+      await device.addEventListener('gattserverdisconnected', onDisconnected);
+      
+      console.log('Connecting to GATT Server...');
+      const server = await device.gatt.connect();
+
+      if (!device) {
+        return
+      }else if (device.gatt.connected) {
+        console.log("Reconnect...");
+        try {
+          await device.gatt.connect()
+        } catch (error) {
+          console.log('Argh!' + error);
+        }
+        return
+      }
+      
+
+      await device.discoverAllServicesAndCharacteristics();
+      console.log('Service...');
+      const services = device.services();
+      services.forEach(async service => {
+        const characteristics = await device.characteristicsForService(service.uuid);
+        characteristics.forEach(console.log());
+      });
+        
+    }
+    </script>
+  </head>
+  <body>
+    <!-- <input ></input>
+    <button onclick="notification()">Notify</button> -->
+    <p>Battery Service</p>
+    <button onclick="onButtonClick()">Read a Battery Level</button>
+    <button onclick="onStartButtonClick()">Start notifications</button>
+    <button onclick="onStopButtonClick()">Stop notifications</button>
+    <p>Heart Rate Service</p>
+    <input type="text"></input>
+    <button onclick="writeHeartRate()">writeHeartRate</button>
+    <button onclick="heartRateNotify()">heartRateNotify</button>
+    
+    <!-- <p>Health Thermometer</p>
+    <button onclick="healthThermometer">healthThermometer</button> -->
+    <p>Read service</p>
+    <button onclick="readService()">readService</button>
+  </body>
+</html>
