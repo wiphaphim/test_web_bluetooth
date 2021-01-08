@@ -1,4 +1,4 @@
 const crypto = require('crypto'),
 
-message = crypto.randomBytes(400).toString('hex');
+message = crypto.randomBytes(100).toString('hex');
 console.log(message);

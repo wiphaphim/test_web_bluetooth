@@ -3,8 +3,8 @@ let options = {filters: [], optionalServices: []}
 
 let serviceUuid = 0xfff0
 
-// let characteristicUuid = 0xfff1; //! for notify
-let characteristicUuid = 0xfff2; //! for read and write reponse
+let characteristicUuid = 0xfff1; //! for notify
+// let characteristicUuid = 0xfff2; //! for read and write reponse
 
 options.filters.push({services: [serviceUuid]})
 options.optionalServices.push(serviceUuid)
@@ -47,6 +47,7 @@ try {
     );
 } catch (error) {
     console.log("Argh! " + error);
+    document.getElementById("resultRead").innerHTML = 'Error = ' + error;
 }
 };
 
@@ -66,8 +67,9 @@ if (myCharacteristic) {
 };
 
 const handleNotifications = (event) => {
+    const decoder = new TextDecoder('utf-8');
     let value = event.target.value;
-    console.log("> value ===> ", value.getUint8(0));
+    console.log("> value ===> ", decoder.decode(value));
     }
 
 //* >>>>>>>>>>>>>>>>>>>>>>> wrtite <<<<<<<<<<<<<<<<<<
@@ -154,6 +156,7 @@ const handleNotifications = (event) => {
         console.log('> write success');
       } catch(error) {
         console.log('Argh! ' + error);
+        document.getElementById("resultRead").innerHTML = 'Error = ' + error;
       }
     
   };
@@ -190,6 +193,7 @@ const readTest = () => {
         });
     } catch (error) {
         console.log("Argh! " + error);
+        document.getElementById("resultRead").innerHTML = 'Error = ' + error;
     }
     
   };
