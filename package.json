@@ -4,8 +4,10 @@
   "description": "",
   "main": "ble.js",
   "dependencies": {
+    "axios": "^0.21.1",
     "crypto": "^1.0.1",
-    "crypto-js": "^4.0.0"
+    "crypto-js": "^4.0.0",
+    "webkit": "0.0.0"
   },
   "devDependencies": {},
   "scripts": {

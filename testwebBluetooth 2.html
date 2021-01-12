@@ -1,0 +1,139 @@
+<html lang="th">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<script type="text/javascript">
+   // alert(1)
+  var time_scan = 500
+  var uuid_device01 = ''
+  var uuid_service01 = ''
+  var uuid_characteristic_read = ''
+  var uuid_characteristic_write = ''
+    function scanDevice() {
+      try {
+        webkit.messageHandlers.scanDevice.postMessage(time_scan);
+      } catch(error) {
+        alert('scanDevice ' + error)
+      }
+    }
+
+    function getPrimaryService() {
+      try {
+        webkit.messageHandlers.getPrimaryService.postMessage(uuid_device01);
+      } catch(error) {
+        alert('getPrimaryService ' + error)
+      }
+    }
+
+    function getCharacteristic() {
+      try {
+        webkit.messageHandlers.getCharacteristic.postMessage(uuid_service01);
+      } catch(error) {
+        alert('getCharacteristic ' + error)
+      }
+    }
+
+    function readCharacteristic() {
+      try {
+        webkit.messageHandlers.readCharacteristic.postMessage(uuid_characteristic_read);
+      } catch(error) {
+        alert('readCharacteristic ' + error)
+      }
+    }
+
+    function writeCharacteristic() {
+      try {
+        webkit.messageHandlers.writeCharacteristic.postMessage({uuid: uuid_characteristic_write, data: document.getElementById("write_characteristic").value});
+      } catch(error) {
+        alert('writeCharacteristic ' + error)
+      }
+    }
+
+
+
+    function oneChatBluetoothCallBackData(type, data) {
+        // alert(type + '__' + data)
+        try {
+          if (type == 'get_device_service') {
+            var obj = JSON.parse(data)
+            var message = '<u>รายชื่ออุปกรณ์ </u><br/>'
+            uuid_device01 = obj.data[0].uuid
+            for (var i = 0; i < obj.data.length; i += 1) {
+              message = message + '<p>' + obj.data[i].bluetooth_name + '</p>'
+            }
+            document.getElementById("listdevice").innerHTML=message;
+          } else if (type == 'get_service') {
+            var obj = JSON.parse(data)
+            var message = '<u>รายชื่อบริการ </u><br/>'
+            uuid_service01 = obj.uuid[0]
+            for (var i = 0; i < obj.uuid.length; i += 1) {
+              message = message + '<p>' + obj.uuid[i] + '</p>'
+              if (obj.uuid[i] == 'AB10') {
+                uuid_service01 = 'AB10'
+              }
+            }
+            document.getElementById("listservice").innerHTML=message;
+          } else if (type == 'get_characteristic') {
+            var obj = JSON.parse(data)
+            var message = '<u>รายชื่อcharacteristic</u><br/>'
+            for (var i = 0; i < obj.data.length; i += 1) {
+              message = message + '<p>' + obj.data[i].uuid + '(' + obj.data[i].type + ')</p>'
+              if (obj.data[i].type == 'read') {
+                uuid_characteristic_read = obj.data[i].uuid
+              } else if (obj.data[i].type == 'write') {
+                uuid_characteristic_write = obj.data[i].uuid
+              }
+            }
+            document.getElementById("listcharacteristic").innerHTML=message;
+          } else if (type == 'read_characteristic') {
+            alert(data)
+          } else if (type == 'write_characteristic') {
+            alert(data)
+          }
+      
+          const jwt = require("jsonwebtoken")
+          const getToken = (req, res) => {
+            try {
+              const token = req.get("Cookie").split("token=")[1].trim()
+              const user = jwt.verify(token, "SECRETKEY")
+              console.log("token ===> ", token);
+              console.log("user ===> ", user);
+            } catch (error) {
+              console.log("error ===> ", error);
+            }
+          
+      }
+
+
+    } catch(error) {
+        alert(error)
+    }
+    
+}
+
+
+</script>
+<body>
+<!--     <h1> <a href="javascript:calltestonetest('reset');">Test Click</a> </h1> <br /><br />
+    <h1> <a href="javascript:callNative01();">CallNative 01 Click</a> </h1> <br /><br />
+    <h1> <a href="javascript:callNative02();">CallNative 02 Click</a> </h1> <br /><br />
+<h1> <span id="myspan"> hereismytext </span><br /></h1>
+<h1> Modify this file to test the "WebView" content.<br /></h1> -->
+
+<h1> <a href="javascript:scanDevice();">scan Device</a> </h1> <br/>
+<span id="listdevice"></span>
+
+<br/><h1> <a href="javascript:getPrimaryService();">select Device01</a> </h1> <br/>
+<span id="listservice"></span>
+
+<br/><h1> <a href="javascript:getCharacteristic();">select Service01</a> </h1> <br/>
+<span id="listcharacteristic"></span>
+
+<br/><h1> <a href="javascript:readCharacteristic();">read</a> </h1> <br/>
+
+<br/><input type="text" id="write_characteristic" placeholder="กรอกข้อมูล" style="width: 50%; color: black; padding: 14px 20px; margin: 8px 0; border: 1px solid black; border-radius: 4px;">
+<h1> <a href="javascript:writeCharacteristic();">write</a> </h1> <br/>
+
+
+</body>
+</html>

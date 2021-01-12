@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>        
+        function hideText() {
+            try {
+                document.getElementById("demo").style.display = "none";
+            } catch (error) {
+                console.log(error);
+                document.getElementById("resultRead").innerHTML = 'Error = ' + error;
+            }
+            
+        }
+    
+        function showText() {
+            try {
+                document.getElementById("demo").style.display = "block";
+                webkit.messageHandlers.jsHandler.postMessage("trigger from JS");
+            } catch (error) {
+                document.getElementById("resultRead").innerHTML = 'Error = ' + error;                
+            }
+        }
+
+        function printHelloWorld() {
+            try {
+                webkit.messageHandlers.test.postMessage("Hello, world!");
+            } catch (error) {
+                document.getElementById("resultRead").innerHTML = 'Error = ' + error;
+            }
+        }
+
+        window.onload = printHelloWorld;
+
+        // const oneChatBluetoothCallBackData = (type, data) => {
+        //     webkit.messageHandlers.scanDevice.postMessage()
+            
+        //     console.log("Requesting Bluetooth Device...");
+        //     const device = await navigator.bluetooth.scanDevice(options);
+
+        //     console.log("Connecting to GATT Server...");
+        //     const server = await device.gatt.connect();
+            
+
+
+        // }
+        // Type :
+        // -	get_device_service
+        // -	get_service
+        // -	get_characteristic
+        // -	read_characteristic
+
+        //     // webkit.messageHandlers.requestDevice.postMessage()
+        // // callBack Type : get_device_service(bluetooth_name)
+
+        // webkit.messageHandlers.scanDevice.postMessage()
+        // callBack Type : get_device_service([bluetooth_name])
+
+        // // webkit.messageHandlers.connectBluetooth.postMessage(bluetooth_name) -> device.connect -> [uuid_service]
+            
+        //     webkit.messageHandlers.getPrimaryService.postMessage(bluetooth_name)
+        //     callBack Type : get_service([uuid_service])
+
+        //     webkit.messageHandlers.getCharacteristic.postMessage(uuid_service)
+        //     callBack Type : get_characteristic([{uuid: characteristic_uuid, type: “read/write”}])
+
+        //     webkit.messageHandlers.readCharacteristic.postMessage(uuid_characteristic)
+        // callBack Type : read_characteristic(data)
+
+        // webkit.messageHandlers.writeCharacteristic.postMessage(uuid_characteristic, writeData)
+        // callBack Type : read_characteristic(data)
+
+
+        // oneChatBluetoothCallBackData("get_service",'["UUID1",    "UUID2",    "UUID3"  ]'')
+
+        // oneChatBluetoothCallBackData("get_characteristic",'[ { "uuid" :"UUID1", type: "read"}, { "uuid" :"UUID2", type: "write"}]'')
+    </script>
+</head>
+<body>
+    <p id="demo">Hello World.</p>
+    <input type="button" onclick="showText()" value="Show Text and Trigger Handler">
+    <input type="button" onclick="hideText()" value="Hide Text"><br><br>
+    <button onclick="printHelloWorld()" >print hello</button><br><br>
+
+    <div id="resultRead"></div>
+</body>
+</html>

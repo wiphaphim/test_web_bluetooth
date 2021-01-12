@@ -2,7 +2,7 @@ let serviceUuid = 0xfff0
 // let characteristicUuid = 0xfff1; //! for notify
 let characteristicUuid = 0xfff2; //! for read and write reponse
 
-let action = 'write'
+let type = 'write'
 
 let options = {filters: [], optionalServices: []}
 
@@ -40,7 +40,7 @@ const onConnectButtonClick = async() => {
             console.log("> value ===> ", decoder.decode(value));
         }
 
-        if (action == 'start_notify') {
+        if (type == 'start_notify') {
             try {
                 myCharacteristic.startNotifications();
                 console.log("> Notifications started");
@@ -52,7 +52,7 @@ const onConnectButtonClick = async() => {
             } catch (error) {
                 console.log("Argh! " + error);
             }
-        } else if (action === 'stop_notify') {
+        } else if (type === 'stop_notify') {
             try {
             await myCharacteristic.stopNotifications();
             console.log("> Notifications stopped");
@@ -63,7 +63,7 @@ const onConnectButtonClick = async() => {
             } catch (error) {
             console.log("Argh! " + error);
             }
-        } else if (action === 'read') {
+        } else if (type === 'read') {
             try { 
             console.log('Reading Battery Level...');
             const value = await myCharacteristic.readValue();
@@ -72,7 +72,7 @@ const onConnectButtonClick = async() => {
             } catch(error) {
                 console.log('Argh! ' + error);
             }          
-        } else if (action === 'write') {
+        } else if (type === 'write') {
             try {
                 console.log("Writing...");
                 // data = Uint32Array.of(6161616161)
