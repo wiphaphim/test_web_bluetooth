@@ -93,16 +93,24 @@
       
           const jwt = require("jsonwebtoken")
           const getToken = (req, res) => {
+            // try {
+            //   const token = req.get("Cookie").split("token=")[1].trim()
+            //   const user = jwt.verify(token, "SECRETKEY")
+            //   console.log("token ===> ", token);
+            //   console.log("user ===> ", user);
+            // } catch (error) {
+            //   console.log("error ===> ", error);
+            // }
             try {
-              const token = req.get("Cookie").split("token=")[1].trim()
-              const user = jwt.verify(token, "SECRETKEY")
-              console.log("token ===> ", token);
-              console.log("user ===> ", user);
+              var param
+              param = getParams(window.location.href)
+              console.log("param ===>", param);
             } catch (error) {
               console.log("error ===> ", error);
             }
           
-      }
+          
+          }
 
 
     } catch(error) {
